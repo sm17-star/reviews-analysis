@@ -1,0 +1,7 @@
+.env
+.ipynb_checkpoints/
+__pycache__/
+logs/
+venv/
+.venv/
+reviews.csv
