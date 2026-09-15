@@ -169,7 +169,7 @@ def run_week3_sentiment_and_ner(df):
 
 
 
-        
+
 def run_week4_topic_modeling_and_trends(df):
     print("\n--- STEP 6: WEEK 4 TOPIC MODELING & LANGUAGE TRENDS ---")
     
@@ -231,3 +231,4 @@ if __name__ == "__main__":
         run_week3_sentiment_and_ner(df)
 
         run_week4_topic_modeling_and_trends(df)
+        
