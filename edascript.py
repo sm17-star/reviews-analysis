@@ -20,6 +20,8 @@ import nltk
 
 nltk.download('vader_lexicon')
 
+from sklearn.decomposition import LatentDirichletAllocation
+from sklearn.feature_extraction.text import CountVectorizer
 
 nltk.download('stopwords')
 nltk.download('wordnet')
@@ -166,6 +168,37 @@ def run_week3_sentiment_and_ner(df):
         print(f"Review {idx + 1} Entities Found: {entities}")
 
 
+
+        
+def run_week4_topic_modeling_and_trends(df):
+    print("\n--- STEP 6: WEEK 4 TOPIC MODELING & LANGUAGE TRENDS ---")
+    
+    # 1. Temporal Trend Analysis (Evolution of reviews over time)
+    if 'Time' in df.columns:
+        print("Analyzing temporal review distributions...")
+        df['Date'] = pd.to_datetime(df['Time'], unit='s')
+        df['Year'] = df['Date'].dt.year
+        
+        yearly_counts = df['Year'].value_counts().sort_index()
+        print("\nReview Volume Evolution by Year:")
+        print(yearly_counts)
+
+    # 2. Unsupervised Topic Modeling using LDA (Latent Dirichlet Allocation)
+    print("\nTraining Latent Dirichlet Allocation (LDA) for Topic Modeling...")
+    cv_topic = CountVectorizer(max_features=1000, stop_words='english', ngram_range=(1,1))
+    dtm = cv_topic.fit_transform(df['clean_text'])
+    
+    # Fit LDA model with 5 distinct topics
+    lda = LatentDirichletAllocation(n_components=5, random_state=42)
+    lda.fit(dtm)
+    
+    # Extract and display top words for each topic
+    feature_names = cv_topic.get_feature_names_out()
+    print("\nDiscovered Language Themes / Topics:")
+    for topic_idx, topic in enumerate(lda.components_):
+        top_words = [feature_names[i] for i in topic.argsort()[:-6:-1]]
+        print(f"Topic {topic_idx + 1}: {', '.join(top_words)}")
+
 if __name__ == "__main__":
     # STEP 1: load data
     df = load_data()
@@ -196,3 +229,5 @@ if __name__ == "__main__":
         run_text_classification(df)
 
         run_week3_sentiment_and_ner(df)
+
+        run_week4_topic_modeling_and_trends(df)
