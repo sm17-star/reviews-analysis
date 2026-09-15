@@ -26,3 +26,4 @@ We analyzed the distribution of word counts per review after cleaning.
 To identify the most dominant individual terms across the dataset, we extracted the top 10 single words using unigram frequency analysis.
 * **Observation:** High-frequency words highlight core subjects and general sentiment indicators (e.g., product, taste, good).
 * **Visualization:** [Top 10 Words Chart](top10_words.png)
+
