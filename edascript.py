@@ -13,6 +13,14 @@ from sklearn.naive_bayes import MultinomialNB
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import classification_report, accuracy_score
 
+
+import spacy
+from nltk.sentiment.vader import SentimentIntensityAnalyzer
+import nltk
+
+nltk.download('vader_lexicon')
+
+
 nltk.download('stopwords')
 nltk.download('wordnet')
 
@@ -123,6 +131,41 @@ def run_text_classification(df):
     print(classification_report(y_test, lr_pred))
 
 
+
+def run_week3_sentiment_and_ner(df):
+    print("\n--- STEP 5: WEEK 3 SENTIMENT ANALYSIS & NER ---")
+    
+    # 1. Sentiment Analysis using NLTK VADER
+    print("Running Sentiment Analysis (VADER)...")
+    sia = SentimentIntensityAnalyzer()
+    
+    sample_df = df.head(5).copy()
+    sample_df['vader_scores'] = sample_df['Text'].apply(lambda x: sia.polarity_scores(str(x)))
+    sample_df['vader_compound'] = sample_df['vader_scores'].apply(lambda score_dict: score_dict['compound'])
+    sample_df['predicted_sentiment'] = sample_df['vader_compound'].apply(
+        lambda c: 'Positive' if c >= 0.05 else ('Negative' if c <= -0.05 else 'Neutral')
+    )
+    
+    print("\nSentiment Analysis Sample Results:")
+    for idx, row in sample_df.iterrows():
+        print(f"Rating: {row['Score']} | VADER Compound: {row['vader_compound']:.4f} | Sentiment: {row['predicted_sentiment']}")
+        print(f"Text Snippet: {row['Text'][:80]}...\n")
+
+    # 2. Named Entity Recognition (NER) using spaCy
+    print("Running Named Entity Recognition (NER) via spaCy...")
+    try:
+        nlp = spacy.load("en_core_web_sm")
+    except OSError:
+        print("SpaCy model 'en_core_web_sm' not found. Run 'python -m spacy download en_core_web_sm' in your terminal.")
+        return
+
+    print("Named Entity Extraction Sample:")
+    for idx, text in enumerate(df['Text'].head(3)):
+        doc = nlp(text)
+        entities = [(ent.text, ent.label_) for ent in doc.ents]
+        print(f"Review {idx + 1} Entities Found: {entities}")
+
+
 if __name__ == "__main__":
     # STEP 1: load data
     df = load_data()
@@ -151,3 +194,5 @@ if __name__ == "__main__":
 
         # STEP 4: Run Week 2 Classification Pipeline
         run_text_classification(df)
+
+        run_week3_sentiment_and_ner(df)
